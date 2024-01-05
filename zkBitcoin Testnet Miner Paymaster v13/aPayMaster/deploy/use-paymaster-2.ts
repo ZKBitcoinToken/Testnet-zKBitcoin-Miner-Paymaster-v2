@@ -14,6 +14,17 @@ var PAYMASTER_ADDRESS = "0x7704484E22bD429c0fDE0049e09c65F856D777da";
 var TOKEN_ADDRESS = "0x9EF042fCc41569d94a0d0Ba6B050cdA75cC9B971";
 
 
+// Global error handlers
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Additional logic for handling the exception
+    // Be cautious about not exiting, the application state might be unstable
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Additional logic for handling the rejection
+});
 
 
 function timeout(ms, promise) {
@@ -28,7 +39,7 @@ function timeout(ms, promise) {
 
 
 
-function getToken(hre: HardhatRuntimeEnvironment, wallet: Wallet) {
+async function getToken(hre: HardhatRuntimeEnvironment, wallet: Wallet) {
 const zkBitcoinABI = [
 		{
         "inputs": [
@@ -163,9 +174,34 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Function to control retries of the main function
 export default async function (hre: HardhatRuntimeEnvironment) {
-var gasLimitBump = 10;
+    let retryDelay = 15000; // Delay between retries in milliseconds
+    let attempt = 0;
+
+    while (true) {
+        try {
+            await retryMain(hre);
+            console.log('Main function succeeded');
+         } catch (error) {
+            console.error(`Attempt ${attempt + 1} failed: `, error);
+            attempt++;
+            await sleep(retryDelay); // Wait for a bit before retrying
+        }
+    }
+}
+
+async function retryMain(hre: HardhatRuntimeEnvironment) {
+var gasLimitBump = 86;
+    let attempt = 0;
+
  while (true) {
+				 // to prevent infinite loop
+				 if(attempt > 200){
+					break;
+				}
+					attempt++;
+       
 
 				const filePath2 = path.join(__dirname, '..', '..', 'aDataToMintHexChallenge.txt');
 
@@ -217,11 +253,17 @@ var gasLimitBump = 10;
 
 
 
+				if(data22Nonce!=null){
 
-				console.log('Challenge: ',data2zzzz);
-				console.log('Nonce: ',data22Nonce);
+					console.log('Challenge: ',data2zzzz);
+					console.log('Nonce: ',data22Nonce);
+				}else{
+				    console.log("We are awaiting more solutions to pile up to send in, everything is working in Paymaster");
+
+				}
 				// Usage example
-
+				var gasLimit=0;
+				var gasPrice=0;
 				const filePath = path.join(__dirname, '..', '..', '_zkBitcoinMiner.conf');
 				var test1;
 				var test2;
@@ -232,7 +274,10 @@ var gasLimitBump = 10;
 						config2=config;
 					  // Now you can use the config object
 					  //console.log('Private Key:', config.privateKey);
-					  console.log('Miner Address:', config.minerAddress);
+					  //console.log('Miner Address:', config.minerAddress);
+				if(data22Nonce!=null){
+					console.log('Miner Address:', config.minerAddress);
+				}
 					  //console.log('Contract Address:', config.contractAddress);
 
 					  // Rest of your code...
@@ -240,9 +285,31 @@ var gasLimitBump = 10;
 					  console.error('Error reading the config file:', error);
 					  // Handle the error as needed...
 					}
+								  
+					// Put the address of the ERC20 token here:
+					TOKEN_ADDRESS = config2.contractAddress;
+	
+				var provider = null;
+				var wallet =  null;
+				 
+				var erc20 =  null;
+				
+				try{
+				
+				
+				provider = new Provider('https://testnet.era.zksync.dev');
+				wallet = new Wallet(config2.privateKey, provider);
+				 
+				erc20 = await getToken(hre, wallet);
+				}catch(error){
+						console.error('Error fetching provider:', error);
+					
+						await sleep(5000); // Wait for 5s before retrying
+						continue;
+				}
 					
 
-//	try{
+	try{
 		
 				var count = data22Nonce.length;
 				if(count > 3){
@@ -275,21 +342,29 @@ var gasLimitBump = 10;
 				if(count>500){
 					count = count - 50;
 				}
-				const provider = new Provider('https://testnet.era.zksync.dev');
-				 const wallet = new Wallet(config2.privateKey, provider);
-				const connectedWallet = wallet.connect(provider);
-				  //console.log(`ERC20 token balance of the wallet before mint: ${await wallet.getBalance(TOKEN_ADDRESS)}`);
+				
+
+				//console.log(`ERC20 token balance of the wallet before mint: ${await wallet.getBalance(TOKEN_ADDRESS)}`);
 
 				PAYMASTER_ADDRESS = config2.contractAddressPayMaster;
 				  console.log(`Paymaster is ${PAYMASTER_ADDRESS}`);
-				  let paymasterBalance = await provider.getBalance(PAYMASTER_ADDRESS);
+				  var paymasterBalance = 0;
+				      try {
+							paymasterBalance = await provider.getBalance(PAYMASTER_ADDRESS);
+							console.log(`Paymaster Balance: ${paymasterBalance}`);
+					} catch (error) {
+						console.error('Error fetching balance:', error);
+						
+						await sleep(5000); // Wait for 5s before retrying
+						break;
+						// Additional error handling as needed
+					}
+				  
+				  
 				  console.log(`Paymaster ETH balance is ${paymasterBalance.toString()}`);
 									  
-					// Put the address of the ERC20 token here:
-					TOKEN_ADDRESS = config2.contractAddress;
-	
-				  const erc20 = getToken(hre, wallet);
-				  const gasPrice = await provider.getGasPrice();
+				
+				  gasPrice = await provider.getGasPrice();
 
 				  // Encoding the "ApprovalBased" paymaster flow's input
 				  const paymasterParams = utils.getPaymasterParams(PAYMASTER_ADDRESS, {
@@ -309,12 +384,8 @@ if(false){
 
 				const subtractAmount = ethers.utils.parseUnits('100000', 'wei');
 
-				  // Ethers units for mint transaction 50 for reward
-				  var minAmts = ethers.utils.parseUnits((count*50).toString(), 'ether');
-						minAmts = minAmts.sub(subtractAmount);
-						
-					console.log("Min Amts: " +minAmts.toString());
-				  var gasLimit = await erc20.estimateGas.multiMint_PayMaster_EZ(config2.minerAddress, data22Nonce, data2zzzz,{
+				
+				  gasLimit = await erc20.estimateGas.multiMint_PayMaster_EZ(config2.minerAddress, data22Nonce, data2zzzz,{
 					customData: {
 					  gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
 					  paymasterParams: paymasterParams,
@@ -322,7 +393,11 @@ if(false){
 				  });
 
 
-					gasLimit = Math.floor(gasLimit*2/3*2/3*gasLimitBump/100);
+					var gasLimitUpdate = Math.floor(gasLimit*2/3*2/3*gasLimitBump/100);
+					if(gasLimitUpdate < gasLimit){
+						gasLimit = gasLimitUpdate;
+					
+					}
 				  const fee = gasPrice.mul(gasLimit.toString());
 				  console.log("Transaction fee estimation is :>> ", fee.toString());
 
@@ -369,18 +444,18 @@ if(false){
 				  
 				const subtractAmount = ethers.utils.parseUnits('100000', 'wei');
 
-				  var minAmts = ethers.utils.parseUnits((count*50).toString(), 'ether');
-						minAmts = minAmts.sub(subtractAmount);
-						
-					console.log("Min Amts: " +minAmts.toString());
 	
-				  var gasLimit = await erc20.estimateGas.multiMint_PayMaster_EZ(config2.minerAddress, data22Nonce, data2zzzz,{
+				  gasLimit = await erc20.estimateGas.multiMint_PayMaster_EZ(config2.minerAddress, data22Nonce, data2zzzz,{
 					customData: {
 					  gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
 					  paymasterParams: paymasterParams,
 					},
 				  });
-					gasLimit = Math.floor(gasLimit*2/3*2/3*gasLimitBump/100);
+					var gasLimitUpdate = Math.floor(gasLimit*2/3*2/3*gasLimitBump/100);
+					if(gasLimitUpdate < gasLimit){
+						gasLimit = gasLimitUpdate;
+					
+					}
 
 				//var gasLimit = 918398; //must remove
 				  const fee = gasPrice.mul(gasLimit.toString());
@@ -423,26 +498,43 @@ var transactionHashz;
 				  console.log(`ERC20 token balance of the the wallet after mint: ${await wallet.getBalance(TOKEN_ADDRESS)}`);
 			
 
-
+				 gasLimitBump = gasLimitBump - Math.floor(gasLimitBump*10/100);
 			try {
 			 var totalETHUSED = gasLimit*gasPrice;
 				const result = await erc20.findMinimumGoodLoops(totalETHUSED);
+				if(result > 4200){
+					result = -1;
+				}
 				console.log(`Minimum Good Loops: ${result.toString()}`);
 			const filePathffffffz = path.join(__dirname, '..', '..', 'MinmumMintsAtLeast.txt');
-			//	fs.writeFileSync(filePathffffffz, result.toString());
+				fs.writeFileSync(filePathffffffz, result.toString());
 
     
 			} catch (error) {
-				console.error('Error calling findMinimumGoodLoops:', error);
+				console.error('Error calling findMinimumGoodLoops setting MinimuMMintsAtLeast to 1 to reset:', error);
+				const result = -1;
+				console.log(`Minimum Good Loops: ${result.toString()}`);
+				const filePathffffffz = path.join(__dirname, '..', '..', 'MinmumMintsAtLeast.txt');
+				fs.writeFileSync(filePathffffffz, result.toString());
+
 			}
 
 }
 				 
 				
-/*	
+	
 	
 	} catch (error) {
+	  console.log("Error contains " + error);
 	
+    // Checking if the error message contains the text 'minAmt'
+	 if (error.message.includes('Cannot read properties of undefined')){
+	  console.log("We are awaiting more solutions to pile up to send in, everything is working");
+		//		 await sleep(1000); // Sleep for 2 seconds (2000 milliseconds)
+	  //console.log("Error contains 'Paymaster', Means Paymaster is out of ETH, please contact us on Discord");
+		
+	 }
+	 
     // Checking if the error message contains the text 'minAmt'
 	 if (error.message.includes('Paymaster balance might not be enough')){
 	  console.log("Error contains 'Paymaster', Means Paymaster is out of ETH, please contact us on Discord");
@@ -451,30 +543,15 @@ var transactionHashz;
 		
 	 }
 	 
-    if (error.message.includes('minAmt')) {
-        // Do something specific when 'minAmt' is found in the error message
-		
-        console.log("You are not meeting the minimum requirements for the Transaction, try increasing ,MaxZKBTCperMint and/or MinZKBTCperMint variable");
-				 await sleep(1000); // Sleep for 2 seconds (2000 milliseconds)
-        console.log("You are not meeting the minimum requirements for the Transaction, try increasing ,MaxZKBTCperMint and/or MinZKBTCperMint variable");
-		
-			const filePathfz = path.join(__dirname, '..', '..', 'counter.txt');
-
-             try{fs.unlinkSync(filePathfz);}catch{}
-
-        // Additional code for handling this specific case
-    } else {
-        // Handling other types of errors
-        //console.log("No new transactions for the PayMaster to send, waiting...");
-    }
 
     // Checking if the error message contains the text 'minAmt'
-	 if (error.message.includes('Not enough gas for transaction') || error.message.includes('Most likely not enough gas provided')){
+	 if (error.message.includes('Not enough gas for transaction') || error.message.includes('Most likely not enough gas provided') || error.message.includes('failed to validate the transaction')){
 	  console.log("Error contains 'Not enough gas for transaction', Means we need to UP the Gas Price, doing that now and resending");
-				 await sleep(250); // Sleep for 2 seconds (2000 milliseconds)
 				 gasLimitBump = gasLimitBump + Math.floor(gasLimitBump*10/100);
-				 
-	  
+		console.log("gas Limit bumped to: "+gasLimitBump.toString());
+				 await sleep(250); // Sleep for 2 seconds (2000 milliseconds)
+		console.log("gas Limit bumped to: "+gasLimitBump.toString());
+		continue;
 	 }else{
 	 
 	 
@@ -483,8 +560,51 @@ var transactionHashz;
 				
 	 
 	 }
+	 if(error.message.includes('MUST mint at least enough zkBTC')){
+	 
+	  console.log("Error contains 'MUST mint at least enough zkBTC', Means we need to UP the Number of Mints on the Miner because its too small at this price");
+	
+	 
+			try {
+			 var totalETHUSED = gasLimit*gasPrice;
+				const result = await erc20.findMinimumGoodLoops(totalETHUSED);
+				console.log(`Minimum Good Loops: ${result.toString()}`);
+			const filePathffffffz = path.join(__dirname, '..', '..', 'MinmumMintsAtLeast.txt');
+				fs.writeFileSync(filePathffffffz, result.toString());
+
+    
+			} catch (error) {
+				console.error('Error calling findMinimumGoodLoops:', error);
+			}
+
+	 
+	 }
+	 
+	 
+	 
+	 
+	 
 	}
-	 */
+	
+	
+	//Update this everytime since its important to know instantly.
+	
+	 
+			try {
+			 var totalETHUSED = gasLimit*gasPrice;
+			 if(totalETHUSED != 0){
+					const result = await erc20.findMinimumGoodLoops(totalETHUSED);
+					console.log(`Minimum Good Loops: ${result.toString()}`);
+					const filePathffffffz = path.join(__dirname, '..', '..', 'MinmumMintsAtLeast.txt');
+					fs.writeFileSync(filePathffffffz, result.toString());
+
+				}
+			} catch (error) {
+				console.error('Error calling findMinimumGoodLoops:', error);
+			}
+
+	
+	 
 	
 				
 				  data2zzzz = null;
@@ -492,6 +612,35 @@ var transactionHashz;
 				
 				 await sleep(2000); // Sleep for 2 seconds (2000 milliseconds)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
