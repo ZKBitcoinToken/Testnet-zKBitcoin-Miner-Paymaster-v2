@@ -145,6 +145,7 @@ pause
 :end
 
 yarn install
-echo Run script again please
+echo Run script again if u just installed things
 pause
-echo Run script again please
+echo Run script again if u just installed things
+pause

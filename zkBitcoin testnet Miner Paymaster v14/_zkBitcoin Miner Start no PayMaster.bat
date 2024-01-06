@@ -43,6 +43,7 @@ if %errorlevel% EQU 22 (
 pause
 
 :end
-echo Run script again
+echo Run script again if u just installed things
 pause
-echo Run script again please
+echo Run script again if u just installed things
+pause
