@@ -1,0 +1,39 @@
+
+*** _zkBitcoinMiner 2.3.0 forked from IwYeo's SoliditySHA3Miner - Untouchable and crnxhh (2024) ***
+*** Built with .NET 5.0 SDK, VC++ 19.28.29914, gcc 4.8.5, nVidia CUDA SDK 10.2 64-bit, and AMD APP SDK v3.0.130.135 (OpenCL)
+
+Donation addresses:
+ETH (or any ERC 20/918 tokens)	: 0x9172ff7884CEFED19327aDaCe9C470eF1796105c
+BTC                             : 3GS5J5hcG6Qcu9xHWGmJaV5ftWLmZuR255
+LTC                             : LbFkAto1qYt8RdTFHL871H4djendcHyCyB
+
+[2024-01-08T23:09:33] [INFO] King making disabled.
+[2024-01-08T23:09:33] [INFO] Solo mining mode.
+[2024-01-08T23:09:33] CUDA [INFO] Device not specified, default assign all CUDA devices.
+[2024-01-08T23:09:33] OpenCL [INFO] AMD APP device not specified, default assign all AMD APP devices.
+[2024-01-08T23:09:33] OpenCL [WARN] Unable to get device count for AMD APP: CL_DEVICE_NOT_FOUND
+[2024-01-08T23:09:33] [INFO] Contract address : 0xfE6D6810AF55C6fB385dBf4812f6555540FF63E8
+[2024-01-08T23:09:34] [INFO] Miner's address : 0x851c0428ee0be11f80d93205f6cB96adBBED22e6
+[2024-01-08T23:09:34] [INFO] ABI specified, using "zkBTC.abi"
+[2024-01-08T23:09:34] [INFO] Gas limit: 51704624
+[2024-01-08T23:09:34] [INFO] Gas to mine: 0.3 GWei
+[2024-01-08T23:09:34] [INFO] Minimum zkBTC per Mint: 2100
+[2024-01-08T23:09:34] [INFO] Gas API URL: 
+[2024-01-08T23:09:34] [INFO] Gas API path: 
+[2024-01-08T23:09:34] [INFO] Gas API path: 
+[2024-01-08T23:09:34] [INFO] Minting ETH from contract: True
+[2024-01-08T23:09:34] BLOCKS PER READJSTMENT 64
+[2024-01-08T23:09:34] [INFO] Checking maximum target from network...
+[2024-01-08T23:09:34] CUDA [WARN] NvSMI library not found.
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Assigning device...
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Assigned device (NVIDIA GeForce GTX 1060 6GB)...
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Compute capability: 6.1
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Intensity: 29.5
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Initializing device...
+[2024-01-08T23:09:34] [INFO] JSON-API service started at http://127.0.0.1:4078/...
+[2024-01-08T23:09:34] [INFO] Checking latest parameters from network...
+[2024-01-08T23:09:34] [INFO] ccminer-API service started at 127.0.0.1:4068...
+[2024-01-08T23:09:34] [INFO] New challenge detected 0x69b8d5f0782696714331bd3beb96efbdfff29172ea0d184fa8a5cf370af1f4c2...
+[2024-01-08T23:09:34] [INFO] New target detected 0x0000000ff6c9e24a148bf6cf02945a36e328545d517d4d3f497d8ba7300562d8...
+[2024-01-08T23:09:34] [INFO] New difficulty detected (64)...
+[2024-01-08T23:09:34] CUDA ID: 0 [INFO] Start mining...
