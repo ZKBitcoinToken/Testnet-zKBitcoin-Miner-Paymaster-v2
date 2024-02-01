@@ -52,41 +52,7 @@ Also must fill in account and private key in _zkBitcoinMiner.conf file
   - If omitted, it is set to my Alchemy account.
   - Replace the value with your web3api as you desire.
 
-3a) NFTApiURL=
-  - If omitted, it is set to the default of no API for NFT minting and instead relies on NFTApiPath and NFTApiPathID to be the NFT contract addressand and NFTApiPathID to be the NFT ID
-   
-3b) NFTApiPath=
-  - Is the path of the JSON result for the contract of the NFT.  i.e. "$.result.NextNFTMint"
-  - IF NFTApiPath is set to "0x1A20D328CF126dD39e03b29979c0815DD101321e" then it is the direct contract of the NFT   i.e. "0x1A20D328CF126dD39e03b29979c0815DD101321e"
-  
-3c) NFTApiPathID=
-  - Is the path to the JSON result for the ID of the NFT. i.e. "$.result.NextNFTMintID"
-  - IF NFTApiURL is set to "447" then it is the direct ID of the NFT i.e. "447"
-  
-4a) Your _zkBitcoinMiner.conf should look lilke this=
-  - "NFTApiURL": "https://abastoken.org/api/abas/0",
-  - "NFTApiPath": "$.result.NextNFTMint",
-  - "NFTApiPathID": "$.result.NextNFTMintID",
-
-4b) or Your _zkBitcoinMiner.conf should look like this=
-  - "NFTApiURL": "",
-  - "NFTApiPath": "0x1A20D328CF126dD39e03b29979c0815DD101321e",
-  - "NFTApiPathID": "447",
-    
-5) ERC20Addresses=
-  - Sepcifies the ERC20 tokens to mint
-  - Must be in an array with quotes around the contract address,
-  - ex: "ERC20Addresses": ["0x5373c1E6b906077dDE3eD4fB5624C089A0C00a66"],
-  - ex2: "ERC20Addresses": ["0x5373c1E6b906077dDE3eD4fB5624C089A0C00a66", "0x504A11aC39f0DE6d9B8171a7e29a80be5BE2BDd3"],
-
-
-6) ETHwithMints=
-  - Sepcifies wether to call a cheaper function that doesn't transfer ETH to you from the contract (in case its dust)
-  - Either false or true
-  - ex: "ETHwithMints": false,
-  - ex2: "ETHwithMints": true,
-
-7) Save and run '_zkBitcoin Miner Start.bat file' in this directory.
+3) Save and run '_zkBitcoin Miner Start.bat file' in this directory.
 
 ### Notes
 
