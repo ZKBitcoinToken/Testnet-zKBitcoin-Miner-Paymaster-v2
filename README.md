@@ -1,80 +1,51 @@
-# zkBitcoin Testnet Miner
+# zkBitcoin Miner Overview
+
 zkBitcoin Miner forked from IwYeo's SoliditySHA3Miner
-Built with .NET 5.0, VC++ 19.28.29914, gcc 4.8.5, nVidia CUDA SDK 10.2 64-bit, and AMD APP SDK v3.0.130.135 (OpenCL)
 
-.NET Core 5.0 can be downloaded from https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-installer
+Designed for developers and enthusiasts looking to mine zkBitcoin, a minable ERC-918 compatible token on zkSync Era.
 
-VC++ 2019 can be downloaded from https://aka.ms/vs/16/release/vc_redist.x64.exe (https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
+## System Requirements and Dependencies
 
-CUDA 9.2 requires a minimum nVidia driver version of 396 [https://www.nvidia.com/drivers/beta]
+The zkBitcoin Miner is built with the following technologies and libraries:
 
-AMD APP SDK v3.0.130.135 (OpenCL) can be downloaded from https://drive.google.com/file/d/1P5jqRGbWRW1l5vxlm8MqaQRBKpUNUSyf/view?usp=sharing
+- **.NET 5.0**: Necessary for running the miner. Download from [Microsoft .NET Download](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-installer).
+- **VC++ 2019**: Required for certain cryptographic functions. Download from [Visual Studio](https://aka.ms/vs/16/release/vc_redist.x64.exe) or [Microsoft Support](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+- **nVidia CUDA SDK 10.2** (64-bit): For nVidia GPU support. Ensure your nVidia drivers are version 396 or above. [nVidia Drivers](https://www.nvidia.com/drivers/beta).
+- **AMD APP SDK v3.0.130.135** (OpenCL): For AMD GPU support. Download from [Google Drive](https://drive.google.com/file/d/1P5jqRGbWRW1l5vxlm8MqaQRBKpUNUSyf/view?usp=sharing).
+- **gcc 4.8.5**: For compiling on Linux-based systems.
 
-# SOLO MODE User must have Ethereum on zk Sync Era Account
-Also must fill in account and private key in _zkBitcoinMiner.conf file
+## Getting Started with Solo Mining
 
-### How to start SOLO mining using zkBitcoin Miner
+### Prerequisites
 
-0) Prequisites :
+Before starting with zkBitcoin mining, ensure you have the following:
 
-0a) .Net Core Runtime
-  * Windows => download and run [https://www.microsoft.com/net/download/thank-you/dotnet-runtime-2.2.2-windows-x64-installer]
-  * Ubuntu => run script 'sudo ./install-deps.sh'
-  * Ethos => run script 'sudo ./install-deps-ethOS.sh'
+- **.NET Core Runtime**: For Windows, download from [Microsoft .NET Download](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-installer). For Ubuntu, use the `sudo ./install-deps.sh` script. For Ethos, use `sudo ./install-deps-ethOS.sh`.
+- **Nvidia or AMD GPU Drivers**: Ensure you have the latest drivers installed that support CUDA or OpenCL, respectively.
 
-0b) Nvidia driver, and/or AMD driver.
+### Configuration
 
-1) Open _zkBitcoinMiner.Conf file
+1. Open the `_zkBitcoinMiner.conf` file for editing.
+2. Update the following configuration parameters as needed:
+   - `minerAddress`: Your zkSync Era (Ethereum) address for mining rewards (must include the '0x' prefix).
+   - `privateKey`: Your private key associated with the mining zkSync Era (Ethereum) address.
+   - `MinZKBTCperMint` and `MaxZKBTCperMint`: Set your desired minimum and maximum zkBitcoin rewards per mint transaction. (Note, if omitted, this will default to `250` and `500` zkBitcoin respectively)
+   - `HowManyBlocksAWAYFromAdjustmentToSendMinimumZKBTC`: Adjust this value based on how many blocks away from the adjustment you wish to start sending the minimum zkBitcoin. This value can be negative. (Note, if omitted, this will default to `100` blocks before a mint)
+   - `web3api`: Replace with your own web3api if needed; defaults to the provided Alchemy account for testing.
 
-2) Below are the following arguments that may/need to be changed :
+3. Save your changes to `_zkBitcoinMiner.conf`.
 
-2a) address=
-  - If omitted, you are not able to mine, a dummy account is the default with no funds.
-  - Replace the value with your own mining Ethereum address (42 characters long including '0x' prefix, case-sensitive).
+### Starting the Miner
 
-2b) privateKey=
-  - If omitted, you are not able to mine, a dummy account is the default with no funds.
-  - Replace the value with your own mining Ethereum address Private key (64 characters long including, case-sensitive).
+To begin mining:
+1. Run the `_zkBitcoin Miner Start.bat` file in the miner's directory.
+2. Ensure you have a minimal amount of ZK Sync Era Ethereum in your account to start.
 
-2c) MinZKBTCperMint=
-  - If omitted, it is set to the default 500 zkBitcoin per mint transaction.
-  - Replace this value with the minimum amount of zkBitcoin you wish to recieve per Mint.
-  
-2d) MaxZKBTCperMint=
-  - If omitted, it is set to the default 250 zkBitcoin per mint transaction.
-  - Replace this value with the maximum amount of zkBitcoin you wish to recieve per Mint.
-  
-2e) HowManyBlocksAWAYFromAdjustmentToSendMinimumZKBTC=
-  - If omitted, it is set to the default 100 blocks before a mint and it will send our solution if MinZKBTCperMint is met.
-  - Replace this value with the amount of zkBitcoin blocks away from the adjustment do you want to start sending MinZKBTCperMint, can be negative.
-  
-2f) web3api=
-  - If omitted, it is set to my Alchemy account.
-  - Replace the value with your web3api as you desire.
+## Usage and Options
 
-3) Save and run '_zkBitcoin Miner Start.bat file' in this directory.
+The miner supports various command-line options for customization, including but not limited to enabling CPU mining, setting GPU intensity, specifying mining pools, and adjusting gas prices for transactions.
 
-### Notes
-
-Please feedback your results and suggestions so that I can improve the miner. 
-You can either add an issue in the repository, or find me in discord (Untouchable_Fge#6920). 
-
-Thanks for trying out this miner!
-
- Suggested a new account with minimial ZK Sync Era Ethereum to begin (10-30$).
- 
-Runs on Windows x64.
-
-LICENSE
-zkBitcoin Miner is licensed under the Apache License, Version 2.0 (the "License");
-Libraries are included in the Software under the following license terms:
-- libkeccak-tiny https://github.com/coruus/keccak-tiny/
-- Nethereum https://github.com/Nethereum/Nethereum/blob/master/LICENSE.md
-- Json.NET https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
-- Common Infrastructure Libraries for .NET http://netcommon.sourceforge.net/license.html
-- Bouncy Castle https://www.bouncycastle.org/licence.html
-
-
+```
 Usage: _zkBitcoinMiner [OPTIONS]
 
 Options:
@@ -178,15 +149,30 @@ Options:
 -  logFile                 Enables logging of console output to '{appPath}\\Log\\{yyyy-MM-dd}.log' (default: false)
 
 -  devFee                  Set developer fee in percentage (default: 2.0%, minimum: 2.0%)
+```
 
-NOTES
-Do refer to 'GuideForSoloMining.txt' on how to get started.
-Configuration is based on CLI (similar to ccminer), except ".abi" files are required for new tokens (You can manually create one and copy from etherscan.com -> Contract -> Code -> Contract ABI).
-Note that there is a configuration file "_zkBitcoinMiner.conf" that saves previous CLI parameters/settings, delete it prior to changing CLI parameters.
-Sample CLI launch parameter can be found in the ".bat" file found together with this miner, please refer to it if you need help.
-You will have to supply your own BSC address (or Private key if you solo mine). It is your own responsibility to mine to the correct address/account.
-It is recommended to use your own web3api (e.g. Infura / Geth / Parity) if you solo mine, default value is for TESTING PURPOSE ONLY.
-There is a default of 2.0% dev fee .
-In the case if the compute load for your GPU is not >= 99%, you can adjust the intensity via (amdIntensity/cudaIntensity/intelIntensity).
+## License
 
-Please feedback your results and suggestions so that I can improve the miner. You can either add an issue in the repository, or find me in discord (untouchable2k). Thanks for trying out this miner!
+zkBitcoin Miner is released under the Apache License, Version 2.0. It includes several third-party libraries under their respective licenses:
+
+- **libkeccak-tiny**: [GitHub Repository](https://github.com/coruus/keccak-tiny/)
+- **Nethereum**: [License Details](https://github.com/Nethereum/Nethereum/blob/master/LICENSE.md)
+- **Json.NET**: [License Details](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md)
+- **Common Infrastructure Libraries for .NET**: [License Details](http://netcommon.sourceforge.net/license.html)
+- **Bouncy Castle**: [License Details](https://www.bouncycastle.org/licence.html)
+
+## Notes
+
+- Refer to 'GuideForSoloMining.txt' on how to get started.
+- Configuration is based on CLI (similar to ccminer), except ".abi" files are required for new tokens (You can manually create one and copy from etherscan.com -> Contract -> Code -> Contract ABI).
+- Sample CLI launch parameter can be found in the ".bat" file found together with this miner, please refer to it if you need help.
+- Ensure you are mining to the correct address/account. This is YOUR RESPONSIBILITY.
+- It is recommended to use your own web3api (e.g. Infura / Geth / Parity) if you solo mine, default value is for TESTING PURPOSES ONLY.
+- A default developer fee of 2.0% is applied.
+- In the case if the compute load for your GPU is not >= 99%, you can adjust the intensity via (amdIntensity/cudaIntensity/intelIntensity).
+
+Thank you for trying out the zkBitcoin Miner!
+
+## Feedback and Support
+
+We welcome your feedback and suggestions to improve the zkBitcoin Miner. Please submit issues to the GitHub repository or reach out via the zkBitcoin Discord to `Untouchable_Fge#6920`, or find out more on the [zkBitcoin website](https://testnet.zkbitcoin.org/index/).
