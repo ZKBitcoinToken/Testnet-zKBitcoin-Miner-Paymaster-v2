@@ -30,7 +30,7 @@ Before starting with zkBitcoin mining, ensure you have the following:
    - `minerAddress`: Your zkSync Era (Ethereum) address for mining rewards (must include the '0x' prefix).
    - `privateKey`: Your private key associated with the mining zkSync Era (Ethereum) address.
    - `MinZKBTCperMint` and `MaxZKBTCperMint`: Set your desired minimum and maximum zkBitcoin rewards per mint transaction. (Note, if omitted, this will default to `250` and `500` zkBitcoin respectively)
-   - `HowManyBlocksAWAYFromAdjustmentToSendMinimumZKBTC`: Adjust this value based on how many blocks away from the adjustment you wish to start sending the minimum zkBitcoin. This value can be negative. (Note, if omitted, this will default to `100` blocks before a mint)
+   - `HowManyBlocksAWAYFromAdjustmentToSendMinimumZKBTC`: Adjust this value based on how many blocks away from the adjustment you wish to start sending the minimum zkBitcoin. This can be a value from 0 - 2000 depending on how many other users are submitting. (Note, if omitted, this will default to `200` blocks)
    - `web3api`: Replace with your own web3api if needed; defaults to the provided Alchemy account for testing.
 
 3. Save your changes to `_zkBitcoinMiner.conf`.
